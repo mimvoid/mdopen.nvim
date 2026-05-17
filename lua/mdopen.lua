@@ -3,7 +3,7 @@ local M = {}
 ---@class mdopen_nvim.Config
 ---@field mdopen_path? string Executable path of mdopen
 ---@field args? string[] Arguments to pass to mdopen commands
-M.config = {}
+local cfg = {}
 
 ---@type vim.SystemObj?
 local process = nil
@@ -36,20 +36,20 @@ local function run_mdopen()
     return
   end
 
-  if M.config.mdopen_path == nil then
+  if cfg.mdopen_path == nil then
     notify_err("Could not find mdopen.")
     return
   end
 
-  if vim.fn.executable(M.config.mdopen_path) == 0 then
-    notify_err(("Could not execute mdopen at %s."):format(M.config.mdopen_path))
+  if vim.fn.executable(cfg.mdopen_path) == 0 then
+    notify_err(("Could not execute mdopen at %s."):format(cfg.mdopen_path))
     return
   end
 
-  local cmd = { M.config.mdopen_path }
+  local cmd = { cfg.mdopen_path }
 
-  if M.config.args ~= nil and #M.config.args ~= 0 then
-    table.insert(cmd, table.concat(M.config.args, " "))
+  if cfg.args ~= nil and #cfg.args ~= 0 then
+    table.insert(cmd, table.concat(cfg.args, " "))
   end
 
   -- mdopen doesn't work with absolute paths, so we split split it into the
@@ -76,11 +76,11 @@ end
 --[[ Plugin module ]]
 
 function M.execute()
-  if M.config.mdopen_path ~= nil and M.config.mdopen_path ~= "" then
-    M.config.mdopen_path = vim.fn.exepath("mdopen")
+  if cfg.mdopen_path ~= nil and cfg.mdopen_path ~= "" then
+    cfg.mdopen_path = vim.fn.exepath("mdopen")
   end
 
-  if M.config.mdopen_path ~= "" then
+  if cfg.mdopen_path ~= "" then
     run_mdopen()
   else
     -- Couldn't find mdopen in the config or exepath, try installing
@@ -102,9 +102,7 @@ end
 ---@param config mdopen_nvim.Config? custom config
 ---@return nil
 function M.setup(config)
-  if config ~= nil then
-    M.config = config
-  end
+  cfg = config or cfg
 
   -- Add plugin commands
   vim.api.nvim_create_user_command("Mdopen", function(_opts)
