@@ -126,6 +126,20 @@ function M.stop()
   end
 end
 
+function M.status()
+  if state.process then
+    if state.process:is_closing() then
+      print("Closing")
+    else
+      print("Running")
+      print("PID", state.process.pid)
+      print("Command", table.concat(state.process.cmd, " "))
+    end
+  else
+    print("Not running")
+  end
+end
+
 ---@param config mdopen_nvim.Config? custom config
 ---@return nil
 function M.setup(config)
@@ -138,6 +152,10 @@ function M.setup(config)
 
   vim.api.nvim_create_user_command("MdopenStop", function(_args)
     M.stop()
+  end, {})
+
+  vim.api.nvim_create_user_command("MdopenStatus", function(_args)
+    M.status()
   end, {})
 
   local augroup = vim.api.nvim_create_augroup("mdopen", {})
